@@ -1,0 +1,98 @@
+# Software Project Submission (Shyamanth Reddy M 23BAI1285)
+
+## JobFunnel Setup Guide
+
+This guide will help you set up and run JobFunnel to search for job listings across multiple platforms.
+
+## Quick Start
+
+### 1. Install JobFunnel
+
+```bash
+pip install git+https://github.com/PaulMcInnis/JobFunnel.git
+```
+
+### 2. Download Configuration
+
+```bash
+python -c "import urllib.request; urllib.request.urlretrieve('https://git.io/JUWeP', 'my_settings.yaml')"
+```
+
+### 3. Run JobFunnel
+
+```bash
+funnel load -s my_settings.yaml
+```
+
+## What is JobFunnel?
+
+JobFunnel is a tool that aggregates job listings from multiple job search platforms into a single, manageable interface. It helps you:
+
+- Search across multiple job boards simultaneously
+- Filter and organize job listings
+- Avoid duplicate applications
+- Track your job search progress
+
+## Configuration
+
+The `my_settings.yaml` file contains all the configuration settings for your job search. You can customize:
+
+- **Search queries**: Job titles, keywords, locations
+- **Platforms**: Which job sites to search (Indeed, Monster, etc.)
+- **Filters**: Salary range, experience level, date posted
+- **Output format**: How results are saved and organized
+
+### Editing Settings
+
+After downloading the configuration file, you can edit `my_settings.yaml` to match your preferences:
+
+```yaml
+# Example settings structure
+search:
+  query: "software engineer"
+  location: "San Francisco, CA"
+  radius: 25 # miles
+
+filters:
+  salary_min: 80000
+  experience_level: ["mid", "senior"]
+
+platforms:
+  indeed: true
+  monster: true
+  glassdoor: true
+```
+
+## Usage
+
+After the initial setup, you can run JobFunnel with your custom settings:
+
+```bash
+funnel load -s my_settings.yaml
+```
+
+The tool will:
+
+1. Scrape job listings from configured platforms
+2. Apply your filters and deduplicate results
+3. Save the results to a local database or file
+4. Provide a summary of found listings
+
+## Output
+
+JobFunnel typically outputs:
+
+- A CSV or JSON file with job listings
+- Console summary of search results
+- Optional: Web interface for browsing jobs
+
+## Troubleshooting
+
+- Ensure you have a stable internet connection
+- Check that your `my_settings.yaml` file is in the current directory
+- Verify Python and pip are properly installed
+- Some job platforms may require API keys or have rate limits
+
+---
+
+**Note**: Always respect job platforms' terms of service and rate limits when using web scraping tools.
