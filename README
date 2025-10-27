@@ -6,19 +6,46 @@ This guide will help you set up and run JobFunnel to search for job listings acr
 
 ## Quick Start
 
-### 1. Install JobFunnel
+### 1. Clone or Download the Project
+
+```bash
+git clone <repository-url>
+cd job_scraper
+```
+
+### 2. Create Virtual Environment
+
+```bash
+python -m venv .venv
+```
+
+### 3. Activate Virtual Environment
+
+**Windows:**
+
+```bash
+.venv\Scripts\activate
+```
+
+**Linux/Mac:**
+
+```bash
+source .venv/bin/activate
+```
+
+### 4. Install JobFunnel
 
 ```bash
 pip install git+https://github.com/PaulMcInnis/JobFunnel.git
 ```
 
-### 2. Download Configuration
+### 5. Download Configuration
 
 ```bash
 python -c "import urllib.request; urllib.request.urlretrieve('https://git.io/JUWeP', 'my_settings.yaml')"
 ```
 
-### 3. Run JobFunnel
+### 6. Run JobFunnel
 
 ```bash
 funnel load -s my_settings.yaml
@@ -28,10 +55,11 @@ funnel load -s my_settings.yaml
 
 JobFunnel is a tool that aggregates job listings from multiple job search platforms into a single, manageable interface. It helps you:
 
-- Search across multiple job boards simultaneously
+- Search across multiple job boards simultaneously (Indeed, Monster, Glassdoor, etc.)
 - Filter and organize job listings
 - Avoid duplicate applications
 - Track your job search progress
+- Export results to CSV format
 
 ## Configuration
 
@@ -39,60 +67,99 @@ The `my_settings.yaml` file contains all the configuration settings for your job
 
 - **Search queries**: Job titles, keywords, locations
 - **Platforms**: Which job sites to search (Indeed, Monster, etc.)
-- **Filters**: Salary range, experience level, date posted
+- **Filters**: Salary range, experience level, date posted, remoteness
 - **Output format**: How results are saved and organized
 
-### Editing Settings
+### Example Settings
 
-After downloading the configuration file, you can edit `my_settings.yaml` to match your preferences:
+After downloading the configuration file, edit `my_settings.yaml` to match your preferences:
 
 ```yaml
-# Example settings structure
 search:
-  query: "software engineer"
-  location: "San Francisco, CA"
-  radius: 25 # miles
+  province: "CA" # or your state/province code
+  city: "San Francisco"
+  keywords:
+    - "software engineer"
+    - "python developer"
+  providers:
+    - Indeed
+    - Glassdoor
+  max_listing_days: 30
+  remoteness: "Any" # Any, Remote, OnSite
+
+output:
+  master_csv: "master_list.csv"
+  block_list: "block_list.json"
+  duplicates_list: "duplicates_list.json"
 
 filters:
-  salary_min: 80000
-  experience_level: ["mid", "senior"]
-
-platforms:
-  indeed: true
-  monster: true
-  glassdoor: true
+  blocked_company_names:
+    - "Company to avoid"
 ```
 
 ## Usage
 
-After the initial setup, you can run JobFunnel with your custom settings:
+### Basic Search
 
 ```bash
 funnel load -s my_settings.yaml
 ```
 
-The tool will:
+### Without Scraping (Use Cache)
 
-1. Scrape job listings from configured platforms
-2. Apply your filters and deduplicate results
-3. Save the results to a local database or file
-4. Provide a summary of found listings
+```bash
+funnel load -s my_settings.yaml --no-scrape
+```
+
+### Recover from Cache
+
+```bash
+funnel load -s my_settings.yaml --recover
+```
 
 ## Output
 
-JobFunnel typically outputs:
+JobFunnel generates:
 
-- A CSV or JSON file with job listings
-- Console summary of search results
-- Optional: Web interface for browsing jobs
+- **master_list.csv**: Main file containing all job listings with columns:
+  - Job title, company, location
+  - Description, salary (if available)
+  - Post date, scrape date
+  - Status (NEW, APPLIED, INTERVIEW, REJECTED, etc.)
+  - Provider, remoteness, tags
+- **Cache files**: Pickled job data for offline access
+- **block_list.json**: Jobs you've blocked/rejected
+- **duplicates_list.json**: Detected duplicate listings
+- **Logs**: Detailed scraping and filtering information
+
+## Features
+
+- **Multi-platform scraping**: Search Indeed, Monster, Glassdoor simultaneously
+- **Duplicate detection**: Automatically identifies similar job postings
+- **Status tracking**: Mark jobs as applied, interviewed, rejected, etc.
+- **Date filtering**: Accept multiple date formats in CSV
+- **Flexible filtering**: Block companies, filter by remoteness, location, and more
+- **Proxy support**: Configure proxy for scraping if needed
 
 ## Troubleshooting
 
-- Ensure you have a stable internet connection
-- Check that your `my_settings.yaml` file is in the current directory
-- Verify Python and pip are properly installed
-- Some job platforms may require API keys or have rate limits
+- **ModuleNotFoundError**: Ensure virtual environment is activated and dependencies are installed
+- **Connection errors**: Check internet connection and verify job platforms are accessible
+- **Configuration errors**: Validate your `my_settings.yaml` syntax and paths
+- **Date parsing issues**: The tool now supports multiple date formats (%Y-%m-%d, %d-%m-%Y, %m/%d/%Y, etc.)
+- **Rate limiting**: Some platforms may have rate limits; the tool includes delays between requests
+
+## Project Structure
+
+```
+job_scraper/
+├── .venv/                  # Virtual environment (ignored by git)
+├── .gitignore             # Git ignore file
+├── my_settings.yaml       # Configuration file
+├── master_list.csv        # Output CSV with job listings
+├── block_list.json        # Blocked jobs list
+├── duplicates_list.json   # Duplicate jobs list
+└── README.md              # This file
+```
 
 ---
-
-**Note**: Always respect job platforms' terms of service and rate limits when using web scraping tools.
